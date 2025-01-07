@@ -1,122 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vesuf IoT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .nav-item.active {
-            color: #1d4ed8; /* Blue-500 */
-        }
-        .nav-item:hover {
-            color: #2563eb; /* Blue-600 */
-        }
+      .nav-item.active {
+        color: #1d4ed8; /* Blue-500 */
+      }
+      .nav-item:hover {
+        color: #2563eb; /* Blue-600 */
+      }
     </style>
-</head>
-<body class="bg-gray-100 font-sans">
+  </head>
+  <body class="bg-gray-100 font-sans">
     <!-- Header -->
     <header class="bg-blue-500 text-white text-center py-4">
-        <h1 class="text-2xl font-bold">Vesuf IoT</h1>
+      <h1 class="text-2xl font-bold">Vesuf IoT</h1>
     </header>
 
     <!-- Main Content -->
     <main class="p-4 mb-16">
-        <section id="home" class="hidden">
-            <h2 class="text-lg font-semibold text-gray-700 mb-4">Selamat Datang di Vesuf IoT</h2>
-            <p class="text-gray-600 mb-4">Platform inovatif untuk mengelola perangkat Internet of Things Anda. Jelajahi fitur-fitur kami dan tingkatkan efisiensi teknologi Anda.</p>
-            <img src="https://via.placeholder.com/600x300" alt="Home Illustration" class="w-full rounded-lg shadow-md">
-        </section>
+      <section id="home" class="hidden">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">
+          Selamat Datang di Vesuf IoT
+        </h2>
+        <p class="text-gray-600 mb-4">
+          Platform inovatif untuk mengelola perangkat Internet of Things Anda.
+          Jelajahi fitur-fitur kami dan tingkatkan efisiensi teknologi Anda.
+        </p>
+        <img
+          src="https://via.placeholder.com/600x300"
+          alt="Home Illustration"
+          class="w-full rounded-lg shadow-md"
+        />
+      </section>
 
-        <section id="apps">
-            <h2 class="text-lg font-semibold text-gray-700 mb-4">Daftar Aplikasi IoT</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <!-- Card 1 -->
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <img src="https://via.placeholder.com/150" alt="App 1" class="w-full h-40 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold text-gray-800">Smart Led Controll</h3>
-                        <p class="text-gray-600">Kendalikan Led Lamp di rumah.</p>
-                        <a href="led.html" > <button class="mt-3 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Masuk</button></a>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <img src="https://via.placeholder.com/150" alt="App 2" class="w-full h-40 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold text-gray-800">Smart Farming</h3>
-                        <p class="text-gray-600">Pantau pertanian dengan sensor canggih.</p>
-                        <button class="mt-3 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Masuk</button>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <img src="https://via.placeholder.com/150" alt="App 3" class="w-full h-40 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold text-gray-800">Smart Health</h3>
-                        <p class="text-gray-600">Monitor kesehatan Anda kapan saja.</p>
-                        <button class="mt-3 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Masuk</button>
-                    </div>
-                </div>
+      <section id="apps">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">
+          Daftar Aplikasi IoT
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <!-- Card 1 -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <img
+              src="img/led.jpg"
+              alt="led control"
+              class="w-full h-60 object-contain"
+            />
+            <div class="p-4">
+              <h3 class="text-lg font-bold text-gray-800">Smart Led Control</h3>
+              <p class="text-gray-600">Kendalikan Led Lamp di rumah.</p>
+              <a href="led.html">
+                <button
+                  class="mt-3 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                >
+                  Masuk
+                </button>
+              </a>
             </div>
-        </section>
+          </div>
 
-        <section id="settings" class="hidden">
-            <h2 class="text-lg font-semibold text-gray-700 mb-4">Pengaturan</h2>
-            <form class="bg-white shadow-md rounded-lg p-4">
-                <div class="mb-4">
-                    <label for="username" class="block text-gray-700 font-medium mb-2">Nama Pengguna</label>
-                    <input type="text" id="username" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan nama pengguna">
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
-                    <input type="email" id="email" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan email">
-                </div>
-                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Simpan Perubahan</button>
-            </form>
-        </section>
+          <!-- Card 2 -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <img
+              src="img/servo.jpeg"
+              alt="led control"
+              class="w-full h-60 object-contain"
+            />
+            <div class="p-4">
+              <h3 class="text-lg font-bold text-gray-800">Smart Servo Control</h3>
+              <p class="text-gray-600">Kendalikan Servo.</p>
+              <a href="servo.html">
+                <button
+                  class="mt-3 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                >
+                  Masuk
+                </button>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <img
+              src="https://via.placeholder.com/150"
+              alt="App 3"
+              class="w-full h-40 object-cover"
+            />
+            <div class="p-4">
+              <h3 class="text-lg font-bold text-gray-800">Cooming Soon</h3>
+              <p class="text-gray-600">tunggu aja.</p>
+              <button
+                class="mt-3 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+              >
+                Masuk
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="hidden">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Pengaturan</h2>
+        <form class="bg-white shadow-md rounded-lg p-4">
+          <div class="mb-4">
+            <label for="username" class="block text-gray-700 font-medium mb-2"
+              >Nama Pengguna</label
+            >
+            <input
+              type="text"
+              id="username"
+              class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Masukkan nama pengguna"
+            />
+          </div>
+          <div class="mb-4">
+            <label for="email" class="block text-gray-700 font-medium mb-2"
+              >Email</label
+            >
+            <input
+              type="email"
+              id="email"
+              class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Masukkan email"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+          >
+            Simpan Perubahan
+          </button>
+        </form>
+      </section>
     </main>
 
     <!-- Navbar -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-md z-10">
-        <div class="flex justify-around items-center py-2">
-            <a href="#home" onclick="showSection('home')" class="nav-item flex flex-col items-center text-gray-600 hover:text-blue-500">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-7 9 7-9 7-9-7z" />
-                </svg>
-                <span class="text-xs">Home</span>
-            </a>
-            <a href="#apps" onclick="showSection('apps')" class="nav-item flex flex-col items-center text-gray-600 hover:text-blue-500">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 013 15.382V8.618a2 2 0 011.553-1.894L9 4m6 16l5.447-2.724A2 2 0 0021 15.382V8.618a2 2 0 00-1.553-1.894L15 4m-6 16V4m6 16V4" />
-                </svg>
-                <span class="text-xs">Apps</span>
-            </a>
-            <a href="#settings" onclick="showSection('settings')" class="nav-item flex flex-col items-center text-gray-600 hover:text-blue-500">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="text-xs">Settings</span>
-            </a>
-        </div>
+      <div class="flex justify-around items-center py-2">
+        <a
+          href="#home"
+          onclick="showSection('home')"
+          class="nav-item flex flex-col items-center text-gray-600 hover:text-blue-500"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 10l9-7 9 7-9 7-9-7z"
+            />
+          </svg>
+          <span class="text-xs">Home</span>
+        </a>
+        <a
+          href="#apps"
+          onclick="showSection('apps')"
+          class="nav-item flex flex-col items-center text-gray-600 hover:text-blue-500"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 20l-5.447-2.724A2 2 0 013 15.382V8.618a2 2 0 011.553-1.894L9 4m6 16l5.447-2.724A2 2 0 0021 15.382V8.618a2 2 0 00-1.553-1.894L15 4m-6 16V4m6 16V4"
+            />
+          </svg>
+          <span class="text-xs">Apps</span>
+        </a>
+        <a
+          href="#settings"
+          onclick="showSection('settings')"
+          class="nav-item flex flex-col items-center text-gray-600 hover:text-blue-500"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span class="text-xs">Settings</span>
+        </a>
+      </div>
     </nav>
 
     <script>
-        function showSection(id) {
-            document.querySelectorAll('main > section').forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(id).classList.remove('hidden');
+      function showSection(id) {
+        document.querySelectorAll("main > section").forEach((section) => {
+          section.classList.add("hidden");
+        });
+        document.getElementById(id).classList.remove("hidden");
 
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            document.querySelector(`.nav-item[href="#${id}"]`).classList.add('active');
-        }
-        // Show default section
-        showSection('apps');
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+        document
+          .querySelector(`.nav-item[href="#${id}"]`)
+          .classList.add("active");
+      }
+      // Show default section
+      showSection("apps");
     </script>
-</body>
+  </body>
 </html>
