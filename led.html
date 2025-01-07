@@ -71,16 +71,16 @@
     </main>
 
     <script>
-        const endPoint = "http://192.168.186.139"; // Correct IP address
+       const endPoint = "/api/esp32-control"; // Menggunakan endpoint API dari Vercel
 
-        // Generic function to toggle LED
-        function toggleLed(led) {
-            fetch(`${endPoint}/${led}`, { method: "POST" })
-                .then(response => response.text())
-                .then(result => {
-                    getStatus();
-                });
-        }
+// Generic function to toggle LED
+function toggleLed(led) {
+    fetch(`${endPoint}?led=${led}`, { method: "POST" })
+        .then(response => response.text())
+        .then(result => {
+            getStatus();
+        });
+}
 
         // Function to fetch current status of all LEDs
         function getStatus() {
