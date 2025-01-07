@@ -23,143 +23,105 @@
 
     <main class="p-4 mb-16">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <!-- LED Merah -->
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <img src="https://via.placeholder.com/150/ff0000" alt="dapur" class="w-full h-40 object-cover">
+                <img src="https://via.placeholder.com/150/ff0000" alt="merah" class="w-full h-40 object-cover" id="imgMerah">
                 <div class="p-4 text-center">
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">LED DAPUR</h3>
-                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusDapur">OFF</span></p>
-                    <button class="w-full py-2 rounded-md led-off" onclick="toggleDapur()">Nyalakan</button>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">LED MERAH</h3>
+                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusMerah">OFF</span></p>
+                    <button class="w-full py-2 rounded-md led-off" onclick="toggleLed('merah')">Nyalakan</button>
                 </div>
             </div>
 
+            <!-- LED Kuning -->
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <img src="https://via.placeholder.com/150/ff0000" alt="tamu" class="w-full h-40 object-cover">
+                <img src="https://via.placeholder.com/150/ff0000" alt="kuning" class="w-full h-40 object-cover" id="imgKuning">
                 <div class="p-4 text-center">
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">LED TAMU</h3>
-                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusTamu">OFF</span></p>
-                    <button class="w-full py-2 rounded-md led-off" onclick="toggleTamu()">Nyalakan</button>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">LED KUNING</h3>
+                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusKuning">OFF</span></p>
+                    <button class="w-full py-2 rounded-md led-off" onclick="toggleLed('kuning')">Nyalakan</button>
                 </div>
             </div>
 
+            <!-- LED Hijau -->
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <img src="https://via.placeholder.com/150/ff0000" alt="makan" class="w-full h-40 object-cover">
+                <img src="https://via.placeholder.com/150/ff0000" alt="hijau" class="w-full h-40 object-cover" id="imgHijau">
                 <div class="p-4 text-center">
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">LED MAKAN</h3>
-                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusMakan">OFF</span></p>
-                    <button class="w-full py-2 rounded-md led-off" onclick="toggleMakan()">Nyalakan</button>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">LED HIJAU</h3>
+                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusHijau">OFF</span></p>
+                    <button class="w-full py-2 rounded-md led-off" onclick="toggleLed('hijau')">Nyalakan</button>
+                </div>
+            </div>
+
+            <!-- Lampu Kedap-Kedip -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <img src="https://via.placeholder.com/150/ff0000" alt="kedip" class="w-full h-40 object-cover" id="imgKedip">
+                <div class="p-4 text-center">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Lampu Kedap-Kedip</h3>
+                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusKedip">OFF</span></p>
+                    <button class="w-full py-2 rounded-md led-off" onclick="toggleLed('kedip')">Nyalakan</button>
                 </div>
             </div>
         </div>
+
+        <a href="" class="btn btn-danger">Kembali</a>
     </main>
 
     <script>
-        const endPoint = "http://192.168.186.139"; // Gantilah dengan IP ESP32 yang sesuai
+        const endPoint = "http://192.168.186.139"; // Correct IP address
 
-    // Fungsi untuk toggle LED Dapur
-function toggleDapur() {
-    console.log("Toggling Dapur LED...");
+        // Generic function to toggle LED
+        function toggleLed(led) {
+            fetch(`${endPoint}/${led}`, { method: "POST" })
+                .then(response => response.text())
+                .then(result => {
+                    getStatus();
+                });
+        }
 
-    // Mengirimkan POST request untuk mengubah status LED Dapur
-    fetch(`${endPoint}/dapur`, { method: "POST" })
-        .then(response => response.text())
-        .then(result => {
-            console.log("Dapur LED response: ", result); // Debugging response
-            // Panggil getStatus() untuk mendapatkan status terbaru setelah toggle
-            getStatus();
-        })
-        .catch(error => {
-            console.error("Error toggling Dapur LED: ", error); // Debugging error
-        });
-}
+        // Function to fetch current status of all LEDs
+        function getStatus() {
+            // Fetch status for all LEDs
+            fetch(`${endPoint}/merah`)
+                .then(response => response.text())
+                .then(result => updateStatus('Merah', result));
+            
+            fetch(`${endPoint}/kuning`)
+                .then(response => response.text())
+                .then(result => updateStatus('Kuning', result));
 
-// Fungsi untuk toggle LED Tamu
-function toggleTamu() {
-    console.log("Toggling Tamu LED...");
+            fetch(`${endPoint}/hijau`)
+                .then(response => response.text())
+                .then(result => updateStatus('Hijau', result));
 
-    // Mengirimkan POST request untuk mengubah status LED Tamu
-    fetch(`${endPoint}/tamu`, { method: "POST" })
-        .then(response => response.text())
-        .then(result => {
-            console.log("Tamu LED response: ", result); // Debugging response
-            // Panggil getStatus() untuk mendapatkan status terbaru setelah toggle
-            getStatus();
-        })
-        .catch(error => {
-            console.error("Error toggling Tamu LED: ", error); // Debugging error
-        });
-}
+            fetch(`${endPoint}/kedip`)
+                .then(response => response.text())
+                .then(result => updateStatus('Kedip', result));
+        }
 
-// Fungsi untuk toggle LED Makan
-function toggleMakan() {
-    console.log("Toggling Makan LED...");
+        // Function to update status and DOM elements
+        function updateStatus(led, status) {
+            const statusElement = document.getElementById(`status${led}`);
+            const button = document.querySelector(`button[onclick="toggleLed('${led.toLowerCase()}')"]`);
+            const img = document.getElementById(`img${led}`);
 
-    // Mengirimkan POST request untuk mengubah status LED Makan
-    fetch(`${endPoint}/makan`, { method: "POST" })
-        .then(response => response.text())
-        .then(result => {
-            console.log("Makan LED response: ", result); // Debugging response
-            // Panggil getStatus() untuk mendapatkan status terbaru setelah toggle
-            getStatus();
-        })
-        .catch(error => {
-            console.error("Error toggling Makan LED: ", error); // Debugging error
-        });
-}
+            if (status === "ON") {
+                statusElement.textContent = "ON";
+                button.classList.remove("led-off");
+                button.classList.add("led-on");
+                button.textContent = "Matikan";
+                img.src = "https://via.placeholder.com/150/00ff00"; // Update image to green (ON)
+            } else {
+                statusElement.textContent = "OFF";
+                button.classList.remove("led-on");
+                button.classList.add("led-off");
+                button.textContent = "Nyalakan";
+                img.src = "https://via.placeholder.com/150/ff0000"; // Update image to red (OFF)
+            }
+        }
 
-// Fungsi untuk mengambil status LED dari ESP32
-function getStatus() {
-    console.log("Fetching LED statuses...");
-
-    // Ambil status LED Dapur
-    fetch(`${endPoint}/dapur`)
-        .then(response => response.text())
-        .then(result => {
-            updateStatus('Dapur', result); // Perbarui status LED Dapur
-        });
-
-    // Ambil status LED Tamu
-    fetch(`${endPoint}/tamu`)
-        .then(response => response.text())
-        .then(result => {
-            updateStatus('Tamu', result); // Perbarui status LED Tamu
-        });
-
-    // Ambil status LED Makan
-    fetch(`${endPoint}/makan`)
-        .then(response => response.text())
-        .then(result => {
-            updateStatus('Makan', result); // Perbarui status LED Makan
-        });
-}
-
-// Fungsi untuk memperbarui status LED di halaman
-function updateStatus(led, status) {
-    console.log(`Updating status for ${led}: ${status}`);
-
-    const statusElement = document.getElementById(`status${led}`);
-    const button = document.querySelector(`button[onclick='toggle${led}()']`);
-    const img = document.querySelector(`img[alt='${led.toLowerCase()}']`);
-
-    if (status === "ON") {
-        console.log(`${led} LED is ON`);
-        statusElement.textContent = "ON";
-        button.classList.remove("led-off");
-        button.classList.add("led-on");
-        button.textContent = "Matikan";
-        img.src = "https://via.placeholder.com/150/00ff00"; // Ganti gambar dengan hijau (ON)
-    } else {
-        console.log(`${led} LED is OFF`);
-        statusElement.textContent = "OFF";
-        button.classList.remove("led-on");
-        button.classList.add("led-off");
-        button.textContent = "Nyalakan";
-        img.src = "https://via.placeholder.com/150/ff0000"; // Ganti gambar dengan merah (OFF)
-    }
-}
-
-// Panggil fungsi getStatus saat halaman dimuat
-window.onload = getStatus;
-
+        // Call getStatus on page load
+        window.onload = getStatus;
     </script>
 </body>
 </html>
