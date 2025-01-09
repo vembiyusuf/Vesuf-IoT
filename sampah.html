@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Led Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .servo-open{
+            background-color: #fca5a5; /* Red-300 */
+            color: #991b1b; /* Red-700 */
+        }
+        .servo-closed {
+            background-color: #86efac; /* Green-300 */
+            color: #166534; /* Green-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-500 text-white flex items-center p-4">
+        <h1 class="text-xl font-bold">Led Control</h1>
+    </header>
+
+    <main class="p-4 mb-16">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4">
+            <!-- Servo Control -->
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <img src="https://via.placeholder.com/150/ff0000" alt="merah" class="w-full h-40 object-cover" id="imgServo">
+                <div class="p-4 text-center">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">TEMPAT SAMPAH</h3>
+                    <p class="text-lg font-bold text-gray-800 mb-2">Status : <span class="status" id="statusServo">TUTUP</span></p>
+                    <button class="w-full py-2 rounded-md servo-closed" onclick="toggleServo()">BUKA</button>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="flex justify-center mt-8">
+                <a href="index.html" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-colors duration-200">Kembali</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // const endPoint = "http://192.168.186.139"; 
+        // const endPoint = "http://192.168.1.9"; 
+
+       const endPoint = "/api/esp32"; // Relative path to Vercel API
+
+function toggleServo() {
+    fetch(`${endPoint}?path=servo`, { method: "POST" })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error("Failed to toggle servo");
+            }
+        })
+        .then(result => {
+            updateStatus(result);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong. Please try again.");
+        });
+}
+
+function updateStatus(status) {
+    const statusElement = document.getElementById("statusServo");
+    const button = document.querySelector("button[onclick='toggleServo()']");
+    const img = document.getElementById("imgServo");
+
+    if (status === "BUKA") {
+        statusElement.textContent = "BUKA";
+        button.classList.remove("servo-closed");
+        button.classList.add("servo-open");
+        button.textContent = "TUTUP";
+        img.src = "https://via.placeholder.com/150/00ff00"; // Update image to green (ON)
+    } else {
+        statusElement.textContent = "TUTUP";
+        button.classList.remove("servo-open");
+        button.classList.add("servo-closed");
+        button.textContent = "BUKA";
+        img.src = "https://via.placeholder.com/150/ff0000"; // Update image to red (OFF)
+    }
+}
+
+// Call updateStatus on page load
+window.onload = function() {
+    updateStatus('TUTUP'); // Initialize the status
+};
+
+    </script>
+</body>
+</html>
