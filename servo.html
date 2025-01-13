@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Servo Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <style>
       .servo-control {
         background-color: #dbeafe; /* Light Blue */
@@ -33,57 +34,76 @@
           <p class="text-lg font-bold text-gray-800 mb-2">
             Angle: <span id="angleDisplay">90</span>°
           </p>
-          <!-- <p id="statusMessage" class="mt-4 text-gray-800"></p> -->
+          <p id="statusMessage" class="mt-4 text-gray-800"></p>
         </div>
       </div>
-       <!-- Back Button -->
-        <div class="flex justify-center mt-8">
-            <a href="index.html" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-colors duration-200">Kembali</a>
-        </div>
+      <!-- Back Button -->
+      <div class="flex justify-center mt-8">
+        <a
+          href="index.html"
+          class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition-colors duration-200"
+        >
+          Kembali
+        </a>
+      </div>
     </main>
 
     <script>
-        const endPoint = "http://192.168.186.139"; // 
+      // Connect to MQTT broker
+      const options = {
+        connectTimeout: 4000,
+        clientId: 'mqttx_1aba0144', 
+        username: 'vesuf-iot',
+        password: 'vJZW5PbJXWRUpY7t',
+        keepalive: 60,
+        clean: true,
+      };
 
- // Replace with your ESP32 IP address
+      const client = mqtt.connect('wss://vesuf-iot.cloud.shiftr.io', options);
+
+      client.on('connect', () => {
+        console.log('Connected to MQTT broker');
+        document.getElementById('statusMessage').textContent =
+          'Connected to MQTT broker';
+      });
+
+      client.on('error', (err) => {
+        console.error('MQTT Error:', err);
+        document.getElementById('statusMessage').textContent =
+          'MQTT Error: ' + err.message;
+      });
 
       function handleInputChange(value) {
         updateAngleDisplay(value);
-        setServoAngle(value);
+        sendServoPosition(value);
       }
 
       function updateAngleDisplay(value) {
-        document.getElementById("angleDisplay").textContent = value;
+        document.getElementById('angleDisplay').textContent = value;
       }
 
-      function setServoAngle(angle) {
-        fetch(`${endPoint}/servo`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: `angle=${angle}`,
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
+      function sendServoPosition(position) {
+        if (position >= 0 && position <= 180) {
+          client.publish('vesuf-iot/servo', position, { qos: 1 }, (err) => {
+            if (err) {
+              console.error('Publish Error:', err);
+              document.getElementById('statusMessage').textContent =
+                'Error sending position';
+            } else {
+              console.log('Servo position sent:', position);
+              document.getElementById('statusMessage').textContent =
+                'Servo position sent: ' + position + '°';
             }
-            return response.text();
-          })
-          .then((result) => {
-            document.getElementById("statusMessage").textContent = result;
-          })
-          .catch((error) => {
-            document.getElementById("statusMessage").textContent =
-              "Error setting angle.";
-            console.error("Error:", error);
           });
+        } else {
+          alert('Please enter a value between 0 and 180.');
+        }
       }
 
       // Set default angle display on page load
-      document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("angleDisplay").textContent =
-          document.getElementById("angleInput").value;
+      document.addEventListener('DOMContentLoaded', () => {
+        const defaultPosition = document.getElementById('angleInput').value;
+        updateAngleDisplay(defaultPosition);
       });
     </script>
   </body>

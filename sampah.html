@@ -41,54 +41,52 @@
     </main>
 
     <script>
-        // const endPoint = "http://192.168.186.139"; 
+        const endPoint = "http://192.168.186.139"; 
         // const endPoint = "http://192.168.1.9"; 
 
-       const endPoint = "/api/esp32"; // Relative path to Vercel API
+        function toggleServo() {
+            fetch(`${endPoint}/servo`, { method: "POST" })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error("Failed to toggle servo");
+                    }
+                })
+                .then(result => {
+                    updateStatus(result);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Something went wrong. Please try again.");
+                });
+        }
 
-function toggleServo() {
-    fetch(`${endPoint}?path=servo`, { method: "POST" })
-        .then(response => {
-            if (response.ok) {
-                return response.text();
+        function updateStatus(status) {
+            const statusElement = document.getElementById("statusServo");
+            const button = document.querySelector("button[onclick='toggleServo()']");
+            const img = document.getElementById("imgServo");
+
+            if (status === "BUKA") {
+                statusElement.textContent = "BUKA";
+                button.classList.remove("servo-closed");
+                button.classList.add("servo-open");
+                button.textContent = "TUTUP";
+                img.src = "https://via.placeholder.com/150/00ff00"; // Update image to green (ON)
             } else {
-                throw new Error("Failed to toggle servo");
+                statusElement.textContent = "TUTUP";
+                button.classList.remove("servo-open");
+                button.classList.add("servo-closed");
+                button.textContent = "BUKA";
+                img.src = "https://via.placeholder.com/150/ff0000"; // Update image to red (OFF)
             }
-        })
-        .then(result => {
-            updateStatus(result);
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Something went wrong. Please try again.");
-        });
-}
+        }
 
-function updateStatus(status) {
-    const statusElement = document.getElementById("statusServo");
-    const button = document.querySelector("button[onclick='toggleServo()']");
-    const img = document.getElementById("imgServo");
-
-    if (status === "BUKA") {
-        statusElement.textContent = "BUKA";
-        button.classList.remove("servo-closed");
-        button.classList.add("servo-open");
-        button.textContent = "TUTUP";
-        img.src = "https://via.placeholder.com/150/00ff00"; // Update image to green (ON)
-    } else {
-        statusElement.textContent = "TUTUP";
-        button.classList.remove("servo-open");
-        button.classList.add("servo-closed");
-        button.textContent = "BUKA";
-        img.src = "https://via.placeholder.com/150/ff0000"; // Update image to red (OFF)
-    }
-}
-
-// Call updateStatus on page load
-window.onload = function() {
-    updateStatus('TUTUP'); // Initialize the status
-};
-
+        // Call getStatus on page load
+        window.onload = function() {
+            // Intialize the status as "TUTUP"
+            updateStatus('TUTUP');
+        };
     </script>
 </body>
 </html>

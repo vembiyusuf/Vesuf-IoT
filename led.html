@@ -71,43 +71,55 @@
     </main>
 
     <script>
-        const endPoint = "/api/esp32";  // API endpoint (use relative path to Vercel API)
+        // const endPoint = "http://192.168.1.9"; 
+        const endPoint = "http://192.168.186.139"; 
+        // const endPoint = "/api/esp32";
 
         // Generic function to toggle LED
-        function toggleLed(led) {
-            fetch(`${endPoint}?path=${led}`, { method: "POST" })
-                .then(response => {
-                    if (response.ok) {
-                        return response.text();
-                    } else {
-                        throw new Error("Failed to toggle LED");
-                    }
-                })
-                .then(result => {
-                    getStatus();  // Update status after toggling
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("Something went wrong. Please try again.");
-                });
-        }
+       function toggleLed(led) {
+    fetch(`${endPoint}/${led}`, { method: "POST" })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error("Failed to toggle LED");
+            }
+        })
+        .then(result => {
+            getStatus();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong. Please try again.");
+        });
+}
+
 
         // Function to fetch current status of all LEDs
         function getStatus() {
-            const leds = ['merah', 'kuning', 'hijau', 'kedip'];
+            // Fetch status for all LEDs
+            fetch(`${endPoint}/merah`)
+                .then(response => response.text())
+                .then(result => updateStatus('Merah', result));
+            
+            fetch(`${endPoint}/kuning`)
+                .then(response => response.text())
+                .then(result => updateStatus('Kuning', result));
 
-            leds.forEach(led => {
-                fetch(`${endPoint}?path=${led}`)
-                    .then(response => response.text())
-                    .then(result => updateStatus(led, result.trim()));
-            });
+            fetch(`${endPoint}/hijau`)
+                .then(response => response.text())
+                .then(result => updateStatus('Hijau', result));
+
+            fetch(`${endPoint}/kedip`)
+                .then(response => response.text())
+                .then(result => updateStatus('Kedip', result));
         }
 
         // Function to update status and DOM elements
         function updateStatus(led, status) {
-            const statusElement = document.getElementById(`status${capitalizeFirstLetter(led)}`);
-            const button = document.querySelector(`button[onclick="toggleLed('${led}')"]`);
-            const img = document.getElementById(`img${capitalizeFirstLetter(led)}`);
+            const statusElement = document.getElementById(`status${led}`);
+            const button = document.querySelector(`button[onclick="toggleLed('${led.toLowerCase()}')"]`);
+            const img = document.getElementById(`img${led}`);
 
             if (status === "ON") {
                 statusElement.textContent = "ON";
@@ -122,11 +134,6 @@
                 button.textContent = "Nyalakan";
                 img.src = "https://via.placeholder.com/150/ff0000"; // Update image to red (OFF)
             }
-        }
-
-        // Capitalize the first letter for LED names
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
         // Call getStatus on page load
