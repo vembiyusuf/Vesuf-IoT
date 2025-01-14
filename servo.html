@@ -3,23 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Servo Control</title>
+    <title>Servo Control & Sensor Data</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <style>
       .servo-control {
-        background-color: #dbeafe; /* Light Blue */
-        color: #1e40af; /* Dark Blue */
+        background-color: #dbeafe;
+        color: #1e40af;
       }
     </style>
   </head>
   <body class="bg-gray-100 font-sans">
     <header class="bg-blue-500 text-white flex items-center p-4">
-      <h1 class="text-xl font-bold">Servo Control</h1>
+      <h1 class="text-xl font-bold">Servo Control & Sensor Data</h1>
     </header>
 
     <main class="p-4 mb-16">
-      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <div class="bg-white shadow-md rounded-lg overflow-hidden mb-8">
         <div class="p-4 text-center">
           <h3 class="text-lg font-bold text-gray-800 mb-2">Servo Motor</h3>
           <input
@@ -37,7 +37,19 @@
           <p id="statusMessage" class="mt-4 text-gray-800"></p>
         </div>
       </div>
-      <!-- Back Button -->
+
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-4 text-center">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Sensor DHT22</h3>
+          <p class="text-lg text-gray-800">
+            Suhu: <span id="temperature">-</span>°C
+          </p>
+          <p class="text-lg text-gray-800">
+            Kelembaban: <span id="humidity">-</span>%
+          </p>
+        </div>
+      </div>
+
       <div class="flex justify-center mt-8">
         <a
           href="index.html"
@@ -49,10 +61,9 @@
     </main>
 
     <script>
-      // Connect to MQTT broker
       const options = {
         connectTimeout: 4000,
-        clientId: 'mqttx_1aba0144', 
+        clientId: 'mqttx_1aba0144',
         username: 'vesuf-iot',
         password: 'vJZW5PbJXWRUpY7t',
         keepalive: 60,
@@ -63,14 +74,21 @@
 
       client.on('connect', () => {
         console.log('Connected to MQTT broker');
-        document.getElementById('statusMessage').textContent =
-          'Connected to MQTT broker';
+        document.getElementById('statusMessage').textContent = 'Connected to MQTT broker';
+        client.subscribe('vesuf-iot/dht');
+      });
+
+      client.on('message', (topic, message) => {
+        if (topic === 'vesuf-iot/dht') {
+          const data = JSON.parse(message.toString());
+          document.getElementById('temperature').textContent = data.temperature;
+          document.getElementById('humidity').textContent = data.humidity;
+        }
       });
 
       client.on('error', (err) => {
         console.error('MQTT Error:', err);
-        document.getElementById('statusMessage').textContent =
-          'MQTT Error: ' + err.message;
+        document.getElementById('statusMessage').textContent = 'MQTT Error: ' + err.message;
       });
 
       function handleInputChange(value) {
@@ -87,12 +105,10 @@
           client.publish('vesuf-iot/servo', position, { qos: 1 }, (err) => {
             if (err) {
               console.error('Publish Error:', err);
-              document.getElementById('statusMessage').textContent =
-                'Error sending position';
+              document.getElementById('statusMessage').textContent = 'Error sending position';
             } else {
               console.log('Servo position sent:', position);
-              document.getElementById('statusMessage').textContent =
-                'Servo position sent: ' + position + '°';
+              document.getElementById('statusMessage').textContent = 'Servo position sent: ' + position + '°';
             }
           });
         } else {
@@ -100,7 +116,6 @@
         }
       }
 
-      // Set default angle display on page load
       document.addEventListener('DOMContentLoaded', () => {
         const defaultPosition = document.getElementById('angleInput').value;
         updateAngleDisplay(defaultPosition);
