@@ -3,85 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Servo & Lampu via MQTT</title>
+    <title>Control ESP via MQTT</title>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        h1 {
-            margin-bottom: 20px;
-            color: #4CAF50;
-        }
-        label, input, button {
-            margin: 10px 0;
-            font-size: 1rem;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-            text-align: center;
-        }
-        input[type="number"] {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .lamp-buttons button {
-            margin: 5px;
-            width: 48%;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Control Servo via MQTT</h1>
-        <label for="servoPosition">Servo Position (0-180): </label>
-        <input type="number" id="servoPosition" min="0" max="180" placeholder="Enter position...">
-        <button onclick="sendServoPosition()">Set Position</button>
-    </div>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+    <div class="container mx-auto p-6 bg-white shadow-lg rounded-xl max-w-xl text-center">
+        <h1 class="text-2xl font-bold text-green-600 mb-4">Control ESP via MQTT</h1>
 
-    <div class="container">
-        <h1>Control Lampu 5W via MQTT</h1>
-        <div class="lamp-buttons">
-            <button onclick="controlLamp('ON')">ON</button>
-            <button onclick="controlLamp('OFF')">OFF</button>
+        <!-- Status ESP -->
+        <div id="espStatus" class="mb-6 p-4 bg-gray-100 rounded-md text-sm text-gray-700">
+            Status ESP: <span class="font-bold text-red-500">Terputus</span>
         </div>
-        <button onclick="startVoiceControl()">🎤 Voice Control</button>
-        <p id="voiceStatus" style="margin-top: 10px; color: #888;">Click the button above to start voice control.</p>
+
+        <!-- Kontrol Servo -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Kontrol Servo</h2>
+            <input type="number" id="servoPosition" min="0" max="180" placeholder="Masukkan posisi (0-180)"
+                class="w-full p-2 border border-gray-300 rounded-md mb-2" />
+            <button onclick="sendServoPosition()" 
+                class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
+                Set Posisi Servo
+            </button>
+        </div>
+
+        <!-- Kontrol Lampu -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Kontrol Lampu</h2>
+            <div class="flex justify-between">
+                <button onclick="controlLamp('ON')" 
+                    class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mr-2">
+                    ON
+                </button>
+                <button onclick="controlLamp('OFF')" 
+                    class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 ml-2">
+                    OFF
+                </button>
+            </div>
+        </div>
+
+        <!-- Voice Control -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Voice Control</h2>
+            <button onclick="startVoiceControl()" 
+                class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+                🎤 Mulai Voice Control
+            </button>
+            <p id="voiceStatus" class="text-gray-500 mt-2">Klik tombol di atas untuk memulai kontrol suara.</p>
+        </div>
+
+        <!-- Data Suhu dan Kelembaban -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Data Sensor</h2>
+            <div class="p-4 bg-gray-100 rounded-md">
+                <p>Suhu: <span id="suhu" class="font-bold">--</span> °C</p>
+                <p>Kelembaban: <span id="kelembaban" class="font-bold">--</span> %</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Connect to MQTT broker
         const options = {
             connectTimeout: 4000,
-            clientId: 'mqttx_1aba0144', 
+            clientId: 'mqttx_1aba0144',
             username: 'vesuf-iot',
             password: 'vJZW5PbJXWRUpY7t',
             keepalive: 60,
@@ -91,83 +75,82 @@
         const client = mqtt.connect('wss://vesuf-iot.cloud.shiftr.io', options);
 
         client.on('connect', () => {
-            console.log('Connected to MQTT broker');
+            console.log('Terhubung ke broker MQTT');
+            document.getElementById('espStatus').innerHTML =
+                'Status ESP: <span class="font-bold text-green-500">Terhubung</span>';
+            client.subscribe('vesuf-iot/#');
         });
 
         client.on('error', (err) => {
-            console.error('MQTT Error:', err);
+            console.error('Kesalahan MQTT:', err);
+            document.getElementById('espStatus').innerHTML =
+                'Status ESP: <span class="font-bold text-red-500">Terputus</span>';
         });
 
-        // Function to send servo position
+        client.on('message', (topic, message) => {
+            const payload = message.toString();
+            console.log('Pesan:', topic, payload);
+
+            if (topic === 'vesuf-iot/suhu') {
+                document.getElementById('suhu').innerText = payload;
+            } else if (topic === 'vesuf-iot/kelembaban') {
+                document.getElementById('kelembaban').innerText = payload;
+            }
+        });
+
         function sendServoPosition() {
             const position = document.getElementById('servoPosition').value;
             if (position >= 0 && position <= 180) {
                 client.publish('vesuf-iot/servo', position, { qos: 1 }, (err) => {
                     if (err) {
-                        console.error('Publish Error:', err);
+                        console.error('Kesalahan Publish:', err);
                     } else {
-                        console.log('Servo position sent:', position);
-                        alert(`Servo moved to position: ${position}`);
+                        alert(`Posisi Servo diatur ke: ${position}`);
                     }
                 });
             } else {
-                alert('Please enter a value between 0 and 180.');
+                alert('Masukkan nilai antara 0 dan 180.');
             }
         }
 
-        // Function to control lamp
         function controlLamp(state) {
             client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
                 if (err) {
-                    console.error('Publish Error:', err);
+                    console.error('Kesalahan Publish:', err);
                 } else {
-                    console.log(`Lamp state sent: ${state}`);
-                    alert(`Lamp turned ${state}`);
+                    alert(`Lampu ${state === 'ON' ? 'Dinyalakan' : 'Dimatikan'}`);
                 }
             });
         }
 
-        // Voice Control
-        // Voice Control
-function startVoiceControl() {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'id-ID'; // Set to Indonesian
+        function startVoiceControl() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'id-ID'; // Bahasa Indonesia
+            recognition.start();
 
-    recognition.start();
+            document.getElementById('voiceStatus').innerText = 'Mendengarkan... Silakan bicara.';
 
-    document.getElementById('voiceStatus').innerText = 'Listening... Please say a command.';
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                document.getElementById('voiceStatus').innerText = `Anda berkata: "${transcript}"`;
 
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        document.getElementById('voiceStatus').innerText = `You said: "${transcript}"`;
+                const lampOnCommands = ['nyalakan lampu', 'hidupkan lampu', 'lampu nyala'];
+                const lampOffCommands = ['matikan lampu', 'lampu mati'];
 
-        // Variasi perintah untuk menyalakan lampu
-        const lampOnCommands = [
-            'nyalakan lampu', 'hidupkan lampu', 'lampu nyala', 
-            'lampu hidup', 'tolong nyalakan lampu', 'tolong hidupkan lampu'
-        ];
+                if (lampOnCommands.some(command => transcript.includes(command))) {
+                    controlLamp('ON');
+                } else if (lampOffCommands.some(command => transcript.includes(command))) {
+                    controlLamp('OFF');
+                } else {
+                    alert('Perintah tidak dikenali. Coba "nyalakan lampu" atau "matikan lampu".');
+                }
+            };
 
-        // Variasi perintah untuk mematikan lampu
-        const lampOffCommands = [
-            'matikan lampu', 'lampu mati', 'tolong matikan lampu', 
-            'tolong padamkan lampu', 'lampu padam'
-        ];
-
-        if (lampOnCommands.some(command => transcript.includes(command))) {
-            controlLamp('ON');
-        } else if (lampOffCommands.some(command => transcript.includes(command))) {
-            controlLamp('OFF');
-        } else {
-            alert('Perintah tidak dikenali. Silakan coba "nyalakan lampu" atau "matikan lampu".');
+            recognition.onerror = (event) => {
+                console.error('Kesalahan Voice Recognition:', event.error);
+                document.getElementById('voiceStatus').innerText = 'Terjadi kesalahan. Coba lagi.';
+            };
         }
-    };
-
-    recognition.onerror = (event) => {
-        console.error('Voice recognition error:', event.error);
-        document.getElementById('voiceStatus').innerText = 'Error occurred. Try again.';
-    };
-}
-
     </script>
 </body>
 </html>
