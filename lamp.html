@@ -73,6 +73,8 @@
             <button onclick="controlLamp('ON')">ON</button>
             <button onclick="controlLamp('OFF')">OFF</button>
         </div>
+        <button onclick="startVoiceControl()">🎤 Voice Control</button>
+        <p id="voiceStatus" style="margin-top: 10px; color: #888;">Click the button above to start voice control.</p>
     </div>
 
     <script>
@@ -123,6 +125,34 @@
                     alert(`Lamp turned ${state}`);
                 }
             });
+        }
+
+        // Voice Control
+        function startVoiceControl() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'id-ID'; // Set to Indonesian
+
+            recognition.start();
+
+            document.getElementById('voiceStatus').innerText = 'Listening... Please say a command.';
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                document.getElementById('voiceStatus').innerText = `You said: "${transcript}"`;
+
+                if (transcript.includes('hidupkan lampu')) {
+                    controlLamp('ON');
+                } else if (transcript.includes('matikan lampu')) {
+                    controlLamp('OFF');
+                } else {
+                    alert('Command not recognized. Please say "hidupkan lampu" or "matikan lampu".');
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Voice recognition error:', event.error);
+                document.getElementById('voiceStatus').innerText = 'Error occurred. Try again.';
+            };
         }
     </script>
 </body>
