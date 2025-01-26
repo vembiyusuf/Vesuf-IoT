@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Servo & Lampu via MQTT</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        label, input, button {
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .lamp-buttons button {
+            margin: 5px;
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Control Servo via MQTT</h1>
+        <label for="servoPosition">Servo Position (0-180): </label>
+        <input type="number" id="servoPosition" min="0" max="180" placeholder="Enter position...">
+        <button onclick="sendServoPosition()">Set Position</button>
+    </div>
+
+    <div class="container">
+        <h1>Control Lampu 5W via MQTT</h1>
+        <div class="lamp-buttons">
+            <button onclick="controlLamp('ON')">ON</button>
+            <button onclick="controlLamp('OFF')">OFF</button>
+        </div>
+    </div>
+
+    <script>
+        // Connect to MQTT broker
+        const options = {
+            connectTimeout: 4000,
+            clientId: 'mqttx_1aba0144', 
+            username: 'vesuf-iot',
+            password: 'vJZW5PbJXWRUpY7t',
+            keepalive: 60,
+            clean: true,
+        };
+
+        const client = mqtt.connect('wss://vesuf-iot.cloud.shiftr.io', options);
+
+        client.on('connect', () => {
+            console.log('Connected to MQTT broker');
+        });
+
+        client.on('error', (err) => {
+            console.error('MQTT Error:', err);
+        });
+
+        // Function to send servo position
+        function sendServoPosition() {
+            const position = document.getElementById('servoPosition').value;
+            if (position >= 0 && position <= 180) {
+                client.publish('vesuf-iot/servo', position, { qos: 1 }, (err) => {
+                    if (err) {
+                        console.error('Publish Error:', err);
+                    } else {
+                        console.log('Servo position sent:', position);
+                        alert(`Servo moved to position: ${position}`);
+                    }
+                });
+            } else {
+                alert('Please enter a value between 0 and 180.');
+            }
+        }
+
+        // Function to control lamp
+        function controlLamp(state) {
+            client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
+                if (err) {
+                    console.error('Publish Error:', err);
+                } else {
+                    console.log(`Lamp state sent: ${state}`);
+                    alert(`Lamp turned ${state}`);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
