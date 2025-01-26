@@ -128,32 +128,46 @@
         }
 
         // Voice Control
-        function startVoiceControl() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'id-ID'; // Set to Indonesian
+        // Voice Control
+function startVoiceControl() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'id-ID'; // Set to Indonesian
 
-            recognition.start();
+    recognition.start();
 
-            document.getElementById('voiceStatus').innerText = 'Listening... Please say a command.';
+    document.getElementById('voiceStatus').innerText = 'Listening... Please say a command.';
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.toLowerCase();
-                document.getElementById('voiceStatus').innerText = `You said: "${transcript}"`;
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        document.getElementById('voiceStatus').innerText = `You said: "${transcript}"`;
 
-                if (transcript.includes('hidupkan lampu' || 'nyalakan lampu' || 'hidup lampu'|| 'nyala lampu' || 'lampu hidup' || 'tolong hidupkan lampu') ) {
-                    controlLamp('ON');
-                } else if (transcript.includes('matikan lampu'|| 'mati lampu' || 'lampu mati' || 'tolong matikan lampu')) {
-                    controlLamp('OFF');
-                } else {
-                    alert('Command not recognized. Please say "hidupkan lampu" or "matikan lampu".');
-                }
-            };
+        // Variasi perintah untuk menyalakan lampu
+        const lampOnCommands = [
+            'nyalakan lampu', 'hidupkan lampu', 'lampu nyala', 
+            'lampu hidup', 'tolong nyalakan lampu', 'tolong hidupkan lampu'
+        ];
 
-            recognition.onerror = (event) => {
-                console.error('Voice recognition error:', event.error);
-                document.getElementById('voiceStatus').innerText = 'Error occurred. Try again.';
-            };
+        // Variasi perintah untuk mematikan lampu
+        const lampOffCommands = [
+            'matikan lampu', 'lampu mati', 'tolong matikan lampu', 
+            'tolong padamkan lampu', 'lampu padam'
+        ];
+
+        if (lampOnCommands.some(command => transcript.includes(command))) {
+            controlLamp('ON');
+        } else if (lampOffCommands.some(command => transcript.includes(command))) {
+            controlLamp('OFF');
+        } else {
+            alert('Perintah tidak dikenali. Silakan coba "nyalakan lampu" atau "matikan lampu".');
         }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+        document.getElementById('voiceStatus').innerText = 'Error occurred. Try again.';
+    };
+}
+
     </script>
 </body>
 </html>
