@@ -138,9 +138,8 @@
     speech.rate = 1; 
     speech.pitch = 1;
 
-    // Tambahkan tindakan pengaktifan jika perangkat Android tidak langsung berbicara
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // Hentikan semua ucapan yang aktif
+        window.speechSynthesis.cancel(); 
         window.speechSynthesis.speak(speech);
     } else {
         alert('Speech Synthesis tidak didukung di perangkat ini.');
