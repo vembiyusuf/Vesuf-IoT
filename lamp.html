@@ -6,21 +6,48 @@
     <title>Control ESP via MQTT</title>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+                input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #fbbf24; /* Tailwind's yellow-500 */
+            border-radius: 5px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #f59e0b; /* Tailwind's yellow-600 */
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #f59e0b; 
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="bg-white min-h-screen flex flex-col items-center justify-start ">
 
-<div class="w-full max-w-screen-sm mx-auto bg-gradient-to-r from-green-500 to-blue-500">
+<div class="w-full max-w-screen-sm mx-auto bg-slate-300">
  
-    <!-- Menampilkan gambar bulat dan tombol arrow left, dengan padding horizontal dihapus -->
-    <div class="flex items-center space-x-2 mb-6 bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-4 ">
+    <div class="flex items-center space-x-2 mb-6 bg-slate-700 p-4 ">
         <a href="vesuf.html#apps">
-            <button class="p-2 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300">
+            <button class="p-2 bg-indigo-400 rounded-full cursor-pointer hover:bg-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 text-white">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </button>
         </a>
-        <img src="img/pp.jpeg" alt="Profile" class="rounded-full w-12 h-12">
+        <img src="img/pp.jpeg" alt="Profile" class="rounded-full w-12 h-12 shadow-30">
         <h1 class="text-2xl font-semibold text-white">Selamat Datang di Vesuf IoT Sistem</h1>
     </div>
 
@@ -52,31 +79,29 @@
 
             <!-- Box untuk data soil moisture -->
             <div class="p-6 bg-white shadow-lg rounded-xl bg-yellow-400">
-                <h2 class="text-xl font-semibold mb-4 text-blue-600">Data Sensor Soil Moisture</h2>
-                <div class="p-4 bg-gray-100 rounded-md">
+                <h2 class="text-xl font-semibold mb-4 text-white">Data Sensor Soil Moisture</h2>
+                <div class="p-4 bg-gray-100 rounded-md text-yellow-400">
                     <p>Kelembaban Tanah: <span id="kelembabanTanah" class="font-bold">--</span> %</p>
                 </div>
             </div>
 
         </div>
 
-        <!-- Grid untuk kontrol lainnya -->
+
         <div class="grid grid-cols-1 gap-6 w-full">
 
-            <!-- Box untuk kontrol servo -->
-            <div class="p-6 bg-white shadow-lg rounded-xl border-l-8 border-yellow-500 my-5">
-                <h2 class="text-xl font-semibold mb-4 text-yellow-600">Kontrol Servo</h2>
-                <input type="number" id="servoPosition" min="0" max="180" placeholder="Masukkan posisi (0-180)"
-                    class="w-full p-2 border border-gray-300 rounded-md mb-2" />
-                <button onclick="sendServoPosition()" 
-                    class="w-full bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600">
-                    Set Posisi Servo
-                </button>
-            </div>
+<div class="p-6 bg-white shadow-lg rounded-xl bg-lime-600 my-5">
+    <h2 class="text-xl font-semibold mb-4 text-white">Kontrol Servo</h2>
+    <input type="range" id="servoPosition" min="0" max="180" value="90" 
+        class="w-full p-2 border border-gray-300 rounded-md mb-2 text-yellow-600" />
+    <p class="text-center text-lg font-bold text-white" id="servoValue">Posisi: 90°</p>
+</div>
+
+
 
             <!-- Box untuk kontrol lampu -->
-            <div class="p-6 bg-white shadow-lg rounded-xl border-l-8 border-red-500">
-                <h2 class="text-xl font-semibold mb-4 text-red-600">Kontrol Lampu</h2>
+            <div class="p-6 bg-white shadow-lg rounded-xl  bg-emerald-700">
+                <h2 class="text-xl font-semibold mb-4 text-white">Kontrol Lampu</h2>
                 <div class="flex justify-between">
                     <button onclick="controlLamp('ON')" 
                         class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mr-2">
@@ -90,13 +115,13 @@
             </div>
 
             <!-- Box untuk kontrol suara -->
-            <div class="p-6 bg-white shadow-lg rounded-xl border-l-8 border-purple-500">
-                <h2 class="text-xl font-semibold mb-4 text-purple-600">Voice Control Lampu</h2>
+            <div class="p-6 bg-white shadow-lg rounded-xl bg-purple-500">
+                <h2 class="text-xl font-semibold mb-4 text-white">Voice Control Lampu</h2>
                 <button onclick="startVoiceControl()" 
-                    class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+                    class="w-full bg-stone-700 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
                     🎤 Mulai Voice Control
                 </button>
-                <p id="voiceStatus" class="text-gray-500 mt-2">Klik tombol di atas untuk memulai kontrol suara.</p>
+                <p id="voiceStatus" class="text-white text-center mt-2">Klik tombol di atas untuk memulai kontrol suara.</p>
             </div>
                 </div>
 
@@ -148,19 +173,20 @@
             }
         });
 
-        function sendServoPosition() {
-            const position = document.getElementById('servoPosition').value;
-            if (position >= 0 && position <= 180) {
-                client.publish('vesuf-iot/servo', position, { qos: 1 }, (err) => {
-                    if (err) {
-                        alert('Kesalahan saat mengatur posisi servo.');
-                        console.error('Kesalahan Publish:', err);
-                    }
-                });
-            } else {
-                alert('Masukkan nilai antara 0 dan 180.');
-            }
+        document.getElementById('servoPosition').addEventListener('input', function() {
+    const servoValue = this.value;
+    document.getElementById('servoValue').innerText = `Posisi: ${servoValue}°`;
+    
+    // Mengirim posisi servo secara langsung saat slider digeser
+    client.publish('vesuf-iot/servo', servoValue, { qos: 1 }, (err) => {
+        if (err) {
+            alert('Kesalahan saat mengatur posisi servo.');
+            console.error('Kesalahan Publish:', err);
         }
+    });
+});
+
+
 
          function controlLamp(state) {
             client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
