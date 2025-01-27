@@ -131,7 +131,7 @@
             });
         }
 
-        function speakResponse(text) {
+function speakResponse(text) {
     const speech = new SpeechSynthesisUtterance(text);
     speech.lang = 'id-ID'; 
     speech.volume = 1; 
@@ -139,12 +139,15 @@
     speech.pitch = 1;
 
     if ('speechSynthesis' in window) {
+        console.log('Speech synthesis tersedia. Mencoba berbicara...');
         window.speechSynthesis.cancel(); 
         window.speechSynthesis.speak(speech);
     } else {
-        alert('Speech Synthesis tidak didukung di perangkat ini.');
+        console.error('Speech Synthesis tidak tersedia di perangkat ini.');
+        alert('Speech Synthesis tidak didukung di perangkat Anda.');
     }
 }
+
 
 
         function startVoiceControl() {
