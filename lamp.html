@@ -68,110 +68,130 @@
 
     </div>
 
-    <script>
-        const options = {
-            connectTimeout: 4000,
-            clientId: 'mqttx_1aba0144',
-            username: 'vesuf-iot',
-            password: 'vJZW5PbJXWRUpY7t',
-            keepalive: 60,
-            clean: true,
-        };
+<script>
+    const options = {
+        connectTimeout: 4000,
+        clientId: 'mqttx_1aba0144',
+        username: 'vesuf-iot',
+        password: 'vJZW5PbJXWRUpY7t',
+        keepalive: 60,
+        clean: true,
+    };
 
-        const client = mqtt.connect('wss://vesuf-iot.cloud.shiftr.io', options);
+    const client = mqtt.connect('wss://vesuf-iot.cloud.shiftr.io', options);
 
-        // Connection event
-        client.on('connect', () => {
-            console.log('Terhubung ke broker MQTT');
-            document.getElementById('espStatus').innerHTML =
-                'Status ESP: <span class="font-bold text-green-500">Terhubung</span>';
-            client.subscribe('vesuf-iot/#');
-        });
+    // Connection event
+    client.on('connect', () => {
+        console.log('Terhubung ke broker MQTT');
+        document.getElementById('espStatus').innerHTML =
+            'Status ESP: <span class="font-bold text-green-500">Terhubung</span>';
+        client.subscribe('vesuf-iot/#');
+    });
 
-        // Disconnection event
-        client.on('close', () => {
-            console.log('Terputus dari broker MQTT');
-            document.getElementById('espStatus').innerHTML =
-                'Status ESP: <span class="font-bold text-red-500">Terputus</span>';
-        });
+    // Disconnection event
+    client.on('close', () => {
+        console.log('Terputus dari broker MQTT');
+        document.getElementById('espStatus').innerHTML =
+            'Status ESP: <span class="font-bold text-red-500">Terputus</span>';
+    });
 
-        // Error handling for MQTT
-        client.on('error', (err) => {
-            console.error('Kesalahan MQTT:', err);
-        });
+    // Error handling for MQTT
+    client.on('error', (err) => {
+        console.error('Kesalahan MQTT:', err);
+    });
 
-        client.on('message', (topic, message) => {
-    const payload = message.toString();
-    console.log('Pesan:', topic, payload);
+    client.on('message', (topic, message) => {
+        const payload = message.toString();
+        console.log('Pesan:', topic, payload);
 
-    if (topic === 'vesuf-iot/suhu') {
-        document.getElementById('suhu').innerText = payload;
-    } else if (topic === 'vesuf-iot/kelembaban') {
-        document.getElementById('kelembaban').innerText = payload;
-    } else if (topic === 'vesuf-iot/wifi') {
-        // Update ESP status based on the message received
-        if (payload === "online") {
-            document.getElementById('espStatus').innerHTML =
-                'Status ESP: <span class="font-bold text-green-500">Terhubung</span>';
-        } else if (payload === "offline") {
-            document.getElementById('espStatus').innerHTML =
-                'Status ESP: <span class="font-bold text-red-500">Terputus</span>';
-        }
-    }
-});
-
-
-        function sendServoPosition() {
-            const position = document.getElementById('servoPosition').value;
-            if (position >= 0 && position <= 180) {
-                client.publish('vesuf-iot/servo', position, { qos: 1 }, (err) => {
-                    if (err) {
-                        alert('Kesalahan saat mengatur posisi servo.');
-                        console.error('Kesalahan Publish:', err);
-                    }
-                });
-            } else {
-                alert('Masukkan nilai antara 0 dan 180.');
+        if (topic === 'vesuf-iot/suhu') {
+            document.getElementById('suhu').innerText = payload;
+        } else if (topic === 'vesuf-iot/kelembaban') {
+            document.getElementById('kelembaban').innerText = payload;
+        } else if (topic === 'vesuf-iot/wifi') {
+            // Update ESP status based on the message received
+            if (payload === "online") {
+                document.getElementById('espStatus').innerHTML =
+                    'Status ESP: <span class="font-bold text-green-500">Terhubung</span>';
+            } else if (payload === "offline") {
+                document.getElementById('espStatus').innerHTML =
+                    'Status ESP: <span class="font-bold text-red-500">Terputus</span>';
             }
         }
+    });
 
-        function controlLamp(state) {
-            client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
+    // Fungsi untuk mengirimkan posisi servo
+    function sendServoPosition() {
+        const position = document.getElementById('servoPosition').value;
+        if (position >= 0 && position <= 180) {
+            client.publish('vesuf-iot/servo', position, { qos: 1 }, (err) => {
                 if (err) {
-                    alert('Kesalahan saat mengontrol lampu.');
+                    alert('Kesalahan saat mengatur posisi servo.');
                     console.error('Kesalahan Publish:', err);
                 }
             });
+        } else {
+            alert('Masukkan nilai antara 0 dan 180.');
         }
+    }
 
-        function startVoiceControl() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'id-ID'; // Bahasa Indonesia
-            recognition.start();
-
-            document.getElementById('voiceStatus').innerText = 'Mendengarkan... Silakan bicara.';
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.toLowerCase();
-                document.getElementById('voiceStatus').innerText = `Anda berkata: "${transcript}"`;
-
-                const lampOnCommands = ['nyalakan lampu', 'hidupkan lampu', 'lampu nyala'];
-                const lampOffCommands = ['matikan lampu', 'lampu mati'];
-
-                if (lampOnCommands.some(command => transcript.includes(command))) {
-                    controlLamp('ON');
-                } else if (lampOffCommands.some(command => transcript.includes(command))) {
-                    controlLamp('OFF');
-                } else {
-                    alert('Perintah tidak dikenali. Coba "nyalakan lampu" atau "matikan lampu".');
+    // Fungsi untuk mengontrol lampu
+    function controlLamp(state) {
+        client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
+            if (err) {
+                alert('Kesalahan saat mengontrol lampu.');
+                console.error('Kesalahan Publish:', err);
+            } else {
+                // Tanggapan suara setelah mengontrol lampu
+                if (state === 'ON') {
+                    speakResponse('Oke, lampu nyala.');
+                } else if (state === 'OFF') {
+                    speakResponse('Oke, lampu mati.');
                 }
-            };
+            }
+        });
+    }
 
-            recognition.onerror = (event) => {
-                console.error('Kesalahan Voice Recognition:', event.error);
-                document.getElementById('voiceStatus').innerText = 'Terjadi kesalahan. Coba lagi.';
-            };
-        }
-    </script>
+    // Fungsi untuk mengeluarkan suara respons
+    function speakResponse(text) {
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'id-ID'; // Bahasa Indonesia
+        speech.volume = 1; // Volume 0 sampai 1
+        speech.rate = 1; // Kecepatan bicara
+        speech.pitch = 1; // Nada bicara
+        window.speechSynthesis.speak(speech);
+    }
+
+    // Fungsi untuk memulai voice control
+    function startVoiceControl() {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'id-ID'; // Bahasa Indonesia
+        recognition.start();
+
+        document.getElementById('voiceStatus').innerText = 'Mendengarkan... Silakan bicara.';
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            document.getElementById('voiceStatus').innerText = `Anda berkata: "${transcript}"`;
+
+            const lampOnCommands = ['nyalakan lampu', 'hidupkan lampu', 'lampu nyala'];
+            const lampOffCommands = ['matikan lampu', 'lampu mati'];
+
+            if (lampOnCommands.some(command => transcript.includes(command))) {
+                controlLamp('ON');
+                
+            } else if (lampOffCommands.some(command => transcript.includes(command))) {
+                controlLamp('OFF');
+            } else {
+                alert('Perintah tidak dikenali. Coba "nyalakan lampu" atau "matikan lampu".');
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Kesalahan Voice Recognition:', event.error);
+            document.getElementById('voiceStatus').innerText = 'Terjadi kesalahan. Coba lagi.';
+        };
+    }
+</script>
 </body>
 </html>
