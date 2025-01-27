@@ -154,12 +154,27 @@
 
     // Fungsi untuk mengeluarkan suara respons
     function speakResponse(text) {
+    // Cek apakah Speech Synthesis tersedia di browser
+    if ('speechSynthesis' in window) {
         const speech = new SpeechSynthesisUtterance(text);
         speech.lang = 'id-ID'; // Bahasa Indonesia
         speech.volume = 1; // Volume 0 sampai 1
         speech.rate = 1; // Kecepatan bicara
         speech.pitch = 1; // Nada bicara
+
+        // Cek jika ada masalah dalam pemrosesan suara
+        speech.onstart = () => {
+            console.log('Suara mulai diputar...');
+        };
+
+        speech.onend = () => {
+            console.log('Suara selesai diputar.');
+        };
+
         window.speechSynthesis.speak(speech);
+    } else {
+        console.log('Speech Synthesis tidak tersedia di browser ini.');
+    }
     }
 
     // Fungsi untuk memulai voice control
