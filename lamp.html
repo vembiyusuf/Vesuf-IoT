@@ -125,11 +125,8 @@
                     alert('Kesalahan saat mengontrol lampu.');
                     console.error('Kesalahan Publish:', err);
                 } else {
-                    if (state === 'ON') {
-                        speakResponse('Lampu nyala.');
-                    } else if (state === 'OFF') {
-                        speakResponse('Lampu mati.');
-                    }
+                    const response = state === 'ON' ? 'Lampu nyala.' : 'Lampu mati.';
+                    speakResponse(response);
                 }
             });
         }
@@ -141,13 +138,11 @@
             speech.rate = 1; 
             speech.pitch = 1;
 
-            document.body.addEventListener('click', () => {
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.speak(speech);
-                } else {
-                    alert('Speech Synthesis tidak didukung di perangkat ini.');
-                }
-            }, { once: true });
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.speak(speech);
+            } else {
+                alert('Speech Synthesis tidak didukung di perangkat ini.');
+            }
         }
 
         function startVoiceControl() {
@@ -159,10 +154,8 @@
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'id-ID';
 
-            document.body.addEventListener('click', () => {
-                recognition.start();
-                document.getElementById('voiceStatus').innerText = 'Mendengarkan... Silakan bicara.';
-            }, { once: true });
+            recognition.start();
+            document.getElementById('voiceStatus').innerText = 'Mendengarkan... Silakan bicara.';
 
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
