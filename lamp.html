@@ -132,18 +132,21 @@
         }
 
         function speakResponse(text) {
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'id-ID'; 
-            speech.volume = 1; 
-            speech.rate = 1; 
-            speech.pitch = 1;
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'id-ID'; 
+    speech.volume = 1; 
+    speech.rate = 1; 
+    speech.pitch = 1;
 
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.speak(speech);
-            } else {
-                alert('Speech Synthesis tidak didukung di perangkat ini.');
-            }
-        }
+    // Tambahkan tindakan pengaktifan jika perangkat Android tidak langsung berbicara
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Hentikan semua ucapan yang aktif
+        window.speechSynthesis.speak(speech);
+    } else {
+        alert('Speech Synthesis tidak didukung di perangkat ini.');
+    }
+}
+
 
         function startVoiceControl() {
             if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
