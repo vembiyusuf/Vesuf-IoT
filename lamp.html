@@ -7,18 +7,30 @@
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
-    <div class="container mx-auto p-6 bg-white shadow-lg rounded-xl max-w-xl text-center">
-        <h1 class="text-2xl font-bold text-green-600 mb-4">Control ESP via MQTT</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-6">
 
-        <!-- Status ESP -->
-        <div id="espStatus" class="mb-6 p-4 bg-gray-100 rounded-md text-sm text-gray-700">
-            Status ESP: <span class="font-bold text-red-500">Terputus</span>
+    <!-- Grid untuk dashboard -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        
+         <!-- Box untuk status ESP -->
+        <div class="p-6 bg-white shadow-lg rounded-xl col-span-1 md:col-span-2 lg:col-span-1">
+            <h2 class="text-xl font-semibold mb-4 text-green-600">Status ESP</h2>
+            <div id="espStatus" class="p-4 bg-gray-100 rounded-md text-sm text-gray-700">
+                Status ESP: <span class="font-bold text-red-500">Terputus</span>
+            </div>
+        </div>
+        <!-- Box untuk data suhu dan kelembaban -->
+        <div class="p-6 bg-white shadow-lg rounded-xl">
+            <h2 class="text-xl font-semibold mb-4">Data Sensor</h2>
+            <div class="p-4 bg-gray-100 rounded-md">
+                <p>Suhu: <span id="suhu" class="font-bold">--</span> °C</p>
+                <p>Kelembaban: <span id="kelembaban" class="font-bold">--</span> %</p>
+            </div>
         </div>
 
-        <!-- Kontrol Servo -->
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-2">Kontrol Servo</h2>
+        <!-- Box untuk kontrol servo -->
+        <div class="p-6 bg-white shadow-lg rounded-xl">
+            <h2 class="text-xl font-semibold mb-4">Kontrol Servo</h2>
             <input type="number" id="servoPosition" min="0" max="180" placeholder="Masukkan posisi (0-180)"
                 class="w-full p-2 border border-gray-300 rounded-md mb-2" />
             <button onclick="sendServoPosition()" 
@@ -27,9 +39,9 @@
             </button>
         </div>
 
-        <!-- Kontrol Lampu -->
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-2">Kontrol Lampu</h2>
+        <!-- Box untuk kontrol lampu -->
+        <div class="p-6 bg-white shadow-lg rounded-xl">
+            <h2 class="text-xl font-semibold mb-4">Kontrol Lampu</h2>
             <div class="flex justify-between">
                 <button onclick="controlLamp('ON')" 
                     class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mr-2">
@@ -42,9 +54,9 @@
             </div>
         </div>
 
-        <!-- Voice Control -->
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-2">Voice Control</h2>
+        <!-- Box untuk kontrol suara -->
+        <div class="p-6 bg-white shadow-lg rounded-xl">
+            <h2 class="text-xl font-semibold mb-4">Voice Control Lampu</h2>
             <button onclick="startVoiceControl()" 
                 class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
                 🎤 Mulai Voice Control
@@ -52,14 +64,8 @@
             <p id="voiceStatus" class="text-gray-500 mt-2">Klik tombol di atas untuk memulai kontrol suara.</p>
         </div>
 
-        <!-- Data Suhu dan Kelembaban -->
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-2">Data Sensor</h2>
-            <div class="p-4 bg-gray-100 rounded-md">
-                <p>Suhu: <span id="suhu" class="font-bold">--</span> °C</p>
-                <p>Kelembaban: <span id="kelembaban" class="font-bold">--</span> %</p>
-            </div>
-        </div>
+       
+
     </div>
 
     <script>
@@ -95,15 +101,25 @@
         });
 
         client.on('message', (topic, message) => {
-            const payload = message.toString();
-            console.log('Pesan:', topic, payload);
+    const payload = message.toString();
+    console.log('Pesan:', topic, payload);
 
-            if (topic === 'vesuf-iot/suhu') {
-                document.getElementById('suhu').innerText = payload;
-            } else if (topic === 'vesuf-iot/kelembaban') {
-                document.getElementById('kelembaban').innerText = payload;
-            }
-        });
+    if (topic === 'vesuf-iot/suhu') {
+        document.getElementById('suhu').innerText = payload;
+    } else if (topic === 'vesuf-iot/kelembaban') {
+        document.getElementById('kelembaban').innerText = payload;
+    } else if (topic === 'vesuf-iot/wifi') {
+        // Update ESP status based on the message received
+        if (payload === "online") {
+            document.getElementById('espStatus').innerHTML =
+                'Status ESP: <span class="font-bold text-green-500">Terhubung</span>';
+        } else if (payload === "offline") {
+            document.getElementById('espStatus').innerHTML =
+                'Status ESP: <span class="font-bold text-red-500">Terputus</span>';
+        }
+    }
+});
+
 
         function sendServoPosition() {
             const position = document.getElementById('servoPosition').value;
