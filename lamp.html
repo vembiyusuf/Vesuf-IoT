@@ -7,64 +7,100 @@
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-6">
+<body class="bg-white min-h-screen flex flex-col items-center justify-start ">
 
-    <!-- Grid untuk dashboard -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-        
+<div class="w-full max-w-screen-sm mx-auto bg-gradient-to-r from-green-500 to-blue-500">
+ 
+    <!-- Menampilkan gambar bulat dan tombol arrow left, dengan padding horizontal dihapus -->
+    <div class="flex items-center space-x-2 mb-6 bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 p-4 ">
+        <a href="vesuf.html#apps">
+            <button class="p-2 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+        </a>
+        <img src="img/pp.jpeg" alt="Profile" class="rounded-full w-12 h-12">
+        <h1 class="text-2xl font-semibold text-white">Selamat Datang di Vesuf IoT Sistem</h1>
+    </div>
+
+    <div class="px-5">
+
+
         <!-- Box untuk status ESP -->
-        <div class="p-6 bg-white shadow-lg rounded-xl col-span-1 md:col-span-2 lg:col-span-1">
-            <h2 class="text-xl font-semibold mb-4 text-green-600">Status ESP</h2>
-            <div id="espStatus" class="p-4 bg-gray-100 rounded-md text-sm text-gray-700">
-                Status ESP: <span class="font-bold text-red-500">Terputus</span>
+        <div class="p-6 bg-white shadow-lg rounded-xl bg-red-500 mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-white">Status Sistem</h2>
+            <div id="brokerStatus" class="p-4 bg-gray-100 rounded-md text-sm text-gray-700">
+                Status Broker: <span class="font-bold text-red-500">Terputus</span>
+            </div>
+            <div id="espStatus" class="p-4 mt-2 bg-gray-100 rounded-md text-sm text-gray-700">
+                Status ESP: <span class="font-bold text-red-500">Mati</span>
             </div>
         </div>
 
-        <!-- Box untuk data suhu dan kelembaban -->
-        <div class="p-6 bg-white shadow-lg rounded-xl">
-            <h2 class="text-xl font-semibold mb-4">Data Sensor</h2>
-            <div class="p-4 bg-gray-100 rounded-md">
-                <p>Suhu: <span id="suhu" class="font-bold">--</span> °C</p>
-                <p>Kelembaban: <span id="kelembaban" class="font-bold">--</span> %</p>
+        <!-- Grid untuk dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+
+            <!-- Box untuk data suhu dan kelembaban -->
+            <div class="p-6 bg-white shadow-lg rounded-xl bg-green-600">
+                <h2 class="text-xl font-semibold mb-4 text-white">Data Sensor Suhu DHT11</h2>
+                <div class="p-4 bg-gray-100 rounded-md text-green-600">
+                    <p>Suhu: <span id="suhu" class="font-bold text-green-600">--</span> °C</p>
+                    <p>Kelembaban: <span id="kelembaban" class="font-bold text-green-600">--</span> %</p>
+                </div>
             </div>
+
+            <!-- Box untuk data soil moisture -->
+            <div class="p-6 bg-white shadow-lg rounded-xl bg-yellow-400">
+                <h2 class="text-xl font-semibold mb-4 text-blue-600">Data Sensor Soil Moisture</h2>
+                <div class="p-4 bg-gray-100 rounded-md">
+                    <p>Kelembaban Tanah: <span id="kelembabanTanah" class="font-bold">--</span> %</p>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Box untuk kontrol servo -->
-        <div class="p-6 bg-white shadow-lg rounded-xl">
-            <h2 class="text-xl font-semibold mb-4">Kontrol Servo</h2>
-            <input type="number" id="servoPosition" min="0" max="180" placeholder="Masukkan posisi (0-180)"
-                class="w-full p-2 border border-gray-300 rounded-md mb-2" />
-            <button onclick="sendServoPosition()" 
-                class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
-                Set Posisi Servo
-            </button>
-        </div>
+        <!-- Grid untuk kontrol lainnya -->
+        <div class="grid grid-cols-1 gap-6 w-full">
 
-        <!-- Box untuk kontrol lampu -->
-        <div class="p-6 bg-white shadow-lg rounded-xl">
-            <h2 class="text-xl font-semibold mb-4">Kontrol Lampu</h2>
-            <div class="flex justify-between">
-                <button onclick="controlLamp('ON')" 
-                    class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mr-2">
-                    ON
+            <!-- Box untuk kontrol servo -->
+            <div class="p-6 bg-white shadow-lg rounded-xl border-l-8 border-yellow-500 my-5">
+                <h2 class="text-xl font-semibold mb-4 text-yellow-600">Kontrol Servo</h2>
+                <input type="number" id="servoPosition" min="0" max="180" placeholder="Masukkan posisi (0-180)"
+                    class="w-full p-2 border border-gray-300 rounded-md mb-2" />
+                <button onclick="sendServoPosition()" 
+                    class="w-full bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600">
+                    Set Posisi Servo
                 </button>
-                <button onclick="controlLamp('OFF')" 
-                    class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 ml-2">
-                    OFF
-                </button>
             </div>
-        </div>
 
-        <!-- Box untuk kontrol suara -->
-        <div class="p-6 bg-white shadow-lg rounded-xl">
-            <h2 class="text-xl font-semibold mb-4">Voice Control Lampu</h2>
-            <button onclick="startVoiceControl()" 
-                class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
-                🎤 Mulai Voice Control
-            </button>
-            <p id="voiceStatus" class="text-gray-500 mt-2">Klik tombol di atas untuk memulai kontrol suara.</p>
-        </div>
+            <!-- Box untuk kontrol lampu -->
+            <div class="p-6 bg-white shadow-lg rounded-xl border-l-8 border-red-500">
+                <h2 class="text-xl font-semibold mb-4 text-red-600">Kontrol Lampu</h2>
+                <div class="flex justify-between">
+                    <button onclick="controlLamp('ON')" 
+                        class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mr-2">
+                        ON
+                    </button>
+                    <button onclick="controlLamp('OFF')" 
+                        class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 ml-2">
+                        OFF
+                    </button>
+                </div>
+            </div>
 
+            <!-- Box untuk kontrol suara -->
+            <div class="p-6 bg-white shadow-lg rounded-xl border-l-8 border-purple-500">
+                <h2 class="text-xl font-semibold mb-4 text-purple-600">Voice Control Lampu</h2>
+                <button onclick="startVoiceControl()" 
+                    class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+                    🎤 Mulai Voice Control
+                </button>
+                <p id="voiceStatus" class="text-gray-500 mt-2">Klik tombol di atas untuk memulai kontrol suara.</p>
+            </div>
+                </div>
+
+        </div>
     </div>
 
     <script>
@@ -82,16 +118,16 @@
         // Connection event
         client.on('connect', () => {
             console.log('Terhubung ke broker MQTT');
-            document.getElementById('espStatus').innerHTML =
-                'Status ESP: <span class="font-bold text-green-500">Terhubung</span>';
+            document.getElementById('brokerStatus').innerHTML =
+                'Status Broker: <span class="font-bold text-green-500">Terhubung</span>';
             client.subscribe('vesuf-iot/#');
         });
 
         // Disconnection event
         client.on('close', () => {
             console.log('Terputus dari broker MQTT');
-            document.getElementById('espStatus').innerHTML =
-                'Status ESP: <span class="font-bold text-red-500">Terputus</span>';
+            document.getElementById('brokerStatus').innerHTML =
+                'Status Broker: <span class="font-bold text-red-500">Terputus</span>';
         });
 
         client.on('message', (topic, message) => {
@@ -102,6 +138,13 @@
                 document.getElementById('suhu').innerText = payload;
             } else if (topic === 'vesuf-iot/kelembaban') {
                 document.getElementById('kelembaban').innerText = payload;
+            } else if (topic === 'vesuf-iot/soil-moisture') {
+                document.getElementById('kelembabanTanah').innerText = payload;
+            } else if (topic === 'vesuf-iot/wifi') {
+                const espStatus = payload === 'online' 
+                    ? '<span class="font-bold text-green-500">Hidup</span>' 
+                    : '<span class="font-bold text-red-500">Mati</span>';
+                document.getElementById('espStatus').innerHTML = `Status ESP: ${espStatus}`;
             }
         });
 
@@ -124,64 +167,8 @@
                 if (err) {
                     alert('Kesalahan saat mengontrol lampu.');
                     console.error('Kesalahan Publish:', err);
-                } else {
-                    const response = state === 'ON' ? 'Lampu nyala.' : 'Lampu mati.';
-                    speakResponse(response);
                 }
             });
-        }
-
-function speakResponse(text) {
-    const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = 'id-ID'; 
-    speech.volume = 1; 
-    speech.rate = 1; 
-    speech.pitch = 1;
-
-    if ('speechSynthesis' in window) {
-        console.log('Speech synthesis tersedia. Mencoba berbicara...');
-        window.speechSynthesis.cancel(); 
-        window.speechSynthesis.speak(speech);
-    } else {
-        console.error('Speech Synthesis tidak tersedia di perangkat ini.');
-        alert('Speech Synthesis tidak didukung di perangkat Anda.');
-    }
-}
-
-
-
-        function startVoiceControl() {
-            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-                alert('Voice recognition tidak didukung pada perangkat ini.');
-                return;
-            }
-
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'id-ID';
-
-            recognition.start();
-            document.getElementById('voiceStatus').innerText = 'Mendengarkan... Silakan bicara.';
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.toLowerCase();
-                document.getElementById('voiceStatus').innerText = `Anda berkata: "${transcript}"`;
-
-                const lampOnCommands = ['nyalakan lampu', 'hidupkan lampu', 'lampu nyala'];
-                const lampOffCommands = ['matikan lampu', 'lampu mati'];
-
-                if (lampOnCommands.some(command => transcript.includes(command))) {
-                    controlLamp('ON');
-                } else if (lampOffCommands.some(command => transcript.includes(command))) {
-                    controlLamp('OFF');
-                } else {
-                    alert('Perintah tidak dikenali. Coba "nyalakan lampu" atau "matikan lampu".');
-                }
-            };
-
-            recognition.onerror = (event) => {
-                console.error('Kesalahan Voice Recognition:', event.error);
-                document.getElementById('voiceStatus').innerText = 'Terjadi kesalahan. Coba lagi.';
-            };
         }
     </script>
 </body>
