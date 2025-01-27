@@ -162,13 +162,30 @@
             }
         }
 
-        function controlLamp(state) {
+         function controlLamp(state) {
             client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
                 if (err) {
                     alert('Kesalahan saat mengontrol lampu.');
                     console.error('Kesalahan Publish:', err);
+                } else {
+                    const response = state === 'ON' ? 'Lampu nyala.' : 'Lampu mati.';
+                    speakResponse(response);
                 }
             });
+        }
+
+        function speakResponse(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'id-ID'; 
+            speech.volume = 1; 
+            speech.rate = 1; 
+            speech.pitch = 1;
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.speak(speech);
+            } else {
+                alert('Speech Synthesis tidak didukung di perangkat ini.');
+            }
         }
     </script>
 </body>
