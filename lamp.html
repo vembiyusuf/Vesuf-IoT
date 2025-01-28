@@ -12,7 +12,7 @@
             appearance: none;
             width: 100%;
             height: 8px;
-            background: #fbbf24; /* Tailwind's yellow-500 */
+            background: #fbbf24; 
             border-radius: 5px;
         }
 
@@ -21,7 +21,7 @@
             appearance: none;
             width: 24px;
             height: 24px;
-            background: #f59e0b; /* Tailwind's yellow-600 */
+            background: #f59e0b; 
             border-radius: 50%;
             cursor: pointer;
         }
@@ -54,7 +54,6 @@
     <div class="px-5">
 
 
-        <!-- Box untuk status ESP -->
         <div class="p-6 bg-white shadow-lg rounded-xl bg-red-500 mb-6">
             <h2 class="text-xl font-semibold mb-4 text-white">Status Sistem</h2>
             <div id="brokerStatus" class="p-4 bg-gray-100 rounded-md text-sm text-gray-700">
@@ -65,10 +64,9 @@
             </div>
         </div>
 
-        <!-- Grid untuk dashboard -->
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
 
-            <!-- Box untuk data suhu dan kelembaban -->
             <div class="p-6 bg-white shadow-lg rounded-xl bg-green-600">
                 <h2 class="text-xl font-semibold mb-4 text-white">Data Sensor Suhu DHT11</h2>
                 <div class="p-4 bg-gray-100 rounded-md text-green-600">
@@ -77,7 +75,7 @@
                 </div>
             </div>
 
-            <!-- Box untuk data soil moisture -->
+
             <div class="p-6 bg-white shadow-lg rounded-xl bg-yellow-400">
                 <h2 class="text-xl font-semibold mb-4 text-white">Data Sensor Soil Moisture</h2>
                 <div class="p-4 bg-gray-100 rounded-md text-yellow-400">
@@ -99,7 +97,6 @@
 
 
 
-            <!-- Box untuk kontrol lampu -->
             <div class="p-6 bg-white shadow-lg rounded-xl  bg-emerald-700">
                 <h2 class="text-xl font-semibold mb-4 text-white">Kontrol Lampu</h2>
                 <div class="flex justify-between">
@@ -114,7 +111,7 @@
                 </div>
             </div>
 
-            <!-- Box untuk kontrol suara -->
+
             <div class="p-6 bg-white shadow-lg rounded-xl bg-purple-500">
                 <h2 class="text-xl font-semibold mb-4 text-white">Voice Control Lampu</h2>
                 <button onclick="startVoiceControl()" 
@@ -140,7 +137,6 @@
 
         const client = mqtt.connect('wss://vesuf-iot.cloud.shiftr.io', options);
 
-        // Connection event
         client.on('connect', () => {
             console.log('Terhubung ke broker MQTT');
             document.getElementById('brokerStatus').innerHTML =
@@ -148,7 +144,6 @@
             client.subscribe('vesuf-iot/#');
         });
 
-        // Disconnection event
         client.on('close', () => {
             console.log('Terputus dari broker MQTT');
             document.getElementById('brokerStatus').innerHTML =
@@ -177,7 +172,6 @@
     const servoValue = this.value;
     document.getElementById('servoValue').innerText = `Posisi: ${servoValue}°`;
     
-    // Mengirim posisi servo secara langsung saat slider digeser
     client.publish('vesuf-iot/servo', servoValue, { qos: 1 }, (err) => {
         if (err) {
             alert('Kesalahan saat mengatur posisi servo.');
@@ -205,7 +199,7 @@
             speech.lang = 'id-ID'; 
             speech.volume = 1; 
             speech.rate = 1; 
-            speech.pitch = 1;
+            speech.pitch = 0.3;
 
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.speak(speech);
@@ -213,6 +207,92 @@
                 alert('Speech Synthesis tidak didukung di perangkat ini.');
             }
         }
+
+
+    let recognition;
+
+    function startVoiceControl() {
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+        } else if ('SpeechRecognition' in window) {
+            recognition = new SpeechRecognition();
+        } else {
+            alert('Speech Recognition tidak didukung di perangkat ini.');
+            return;
+        }
+
+        recognition.lang = 'id-ID'; // Bahasa Indonesia
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            document.getElementById('voiceStatus').innerText = "Mendengarkan... Silakan berbicara.";
+        };
+
+        recognition.onresult = (event) => {
+            const hasil = event.results[0][0].transcript.toLowerCase();
+            document.getElementById('voiceStatus').innerText = `Anda berkata: "${hasil}"`;
+            processVoiceCommand(hasil);
+        };
+
+        recognition.onerror = (event) => {
+            document.getElementById('voiceStatus').innerText = "Terjadi kesalahan: " + event.error;
+        };
+
+        recognition.onend = () => {
+            document.getElementById('voiceStatus').innerText = "Voice control selesai.";
+        };
+
+        recognition.start();
+    }
+
+    function processVoiceCommand(command) {
+        // Daftar frasa untuk menyalakan lampu
+        const perintahNyalakan = [
+            "nyalakan lampu",
+            "lampu nyala",
+            "hidupkan lampu",
+            "lampu hidup",
+            "menyalalah lampu",
+            "tolong nyalakan lampu",
+            "bisa nyalakan lampu"
+        ];
+
+        // Daftar frasa untuk mematikan lampu
+        const perintahMatikan = [
+            "matikan lampu",
+            "lampu mati",
+            "padamkan lampu",
+            "lampu padam",
+            "tolong matikan lampu",
+            "bisa matikan lampu"
+        ];
+
+        if (perintahNyalakan.some(perintah => command.includes(perintah))) {
+            controlLamp("ON");
+            speakResponse("Lampu telah dinyalakan.");
+        } else if (perintahMatikan.some(perintah => command.includes(perintah))) {
+            controlLamp("OFF");
+            speakResponse("Lampu telah dimatikan.");
+        } else {
+            speakResponse("Perintah tidak dikenali. Coba lagi.");
+        }
+    }
+
+    function controlLamp(state) {
+        client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
+            if (err) {
+                alert('Kesalahan saat mengontrol lampu.');
+                console.error('Kesalahan Publish:', err);
+            } else {
+                const response = state === 'ON' ? 'Lampu nyala.' : 'Lampu mati.';
+                speakResponse(response);
+            }
+        });
+    }
+
+
+
     </script>
 </body>
 </html>
