@@ -65,11 +65,18 @@ function controlLamp(state) {
             alert('Kesalahan saat mengontrol lampu.');
             console.error('Kesalahan Publish:', err);
         } else {
-            const response = state === 'ON' ? 'Lampu nyala.' : 'Lampu mati.';
-            speakResponse(response);
+            const lampStatusElement = document.getElementById('lampStatus');
+            if (state === 'ON') {
+                lampStatusElement.innerHTML = '<span class="font-bold text-green-500">Nyala</span>';
+                speakResponse("Lampu telah dinyalakan.");
+            } else {
+                lampStatusElement.innerHTML = '<span class="font-bold text-red-500">Mati</span>';
+                speakResponse("Lampu telah dimatikan.");
+            }
         }
     });
 }
+
 
 function speakResponse(text) {
     const speech = new SpeechSynthesisUtterance(text);
