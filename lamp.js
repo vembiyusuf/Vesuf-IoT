@@ -88,6 +88,7 @@ function speakResponse(text) {
 let recognition;
 
 function startVoiceControl() {
+    console.log('Memulai voice control...');
     if ('webkitSpeechRecognition' in window) {
         recognition = new webkitSpeechRecognition();
     } else if ('SpeechRecognition' in window) {
