@@ -6,8 +6,9 @@
     <title>Control ESP via MQTT</title>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="lamp.js"></script>
     <style>
-                input[type="range"] {
+        input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
@@ -35,11 +36,11 @@
         }
     </style>
 </head>
-<body class="bg-white min-h-screen flex flex-col items-center justify-start ">
+<body class="bg-white min-h-screen flex flex-col items-center justify-start">
 
 <div class="w-full max-w-screen-sm mx-auto bg-slate-300">
  
-    <div class="flex items-center space-x-2 mb-6 bg-slate-700 p-4 ">
+    <div class="flex items-center space-x-2 mb-6 bg-slate-700 p-4">
         <a href="vesuf.html#apps">
             <button class="p-2 bg-indigo-400 rounded-full cursor-pointer hover:bg-indigo-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 text-white">
@@ -53,7 +54,6 @@
 
     <div class="px-5">
 
-
         <div class="p-6 bg-white shadow-lg rounded-xl bg-red-500 mb-6">
             <h2 class="text-xl font-semibold mb-4 text-white">Status Sistem</h2>
             <div id="brokerStatus" class="p-4 bg-gray-100 rounded-md text-sm text-gray-700">
@@ -63,7 +63,6 @@
                 Status ESP: <span class="font-bold text-red-500">Mati</span>
             </div>
         </div>
-
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
 
@@ -75,7 +74,6 @@
                 </div>
             </div>
 
-
             <div class="p-6 bg-white shadow-lg rounded-xl bg-yellow-400">
                 <h2 class="text-xl font-semibold mb-4 text-white">Data Sensor Soil Moisture</h2>
                 <div class="p-4 bg-gray-100 rounded-md text-yellow-400">
@@ -83,21 +81,25 @@
                 </div>
             </div>
 
-        </div>
+            <div class="p-6 bg-white shadow-lg rounded-xl bg-blue-500">
+                <h2 class="text-xl font-semibold mb-4 text-white">Data Sensor Kecerahan</h2>
+                <div class="p-4 bg-gray-100 rounded-md text-blue-500">
+                    <p>Kecerahan: <span id="kecerahan" class="font-bold">--</span> lx</p>
+                </div>
+            </div>
 
+        </div>
 
         <div class="grid grid-cols-1 gap-6 w-full">
 
-<div class="p-6 bg-white shadow-lg rounded-xl bg-lime-600 my-5">
-    <h2 class="text-xl font-semibold mb-4 text-white">Kontrol Servo</h2>
-    <input type="range" id="servoPosition" min="0" max="180" value="90" 
-        class="w-full p-2 border border-gray-300 rounded-md mb-2 text-yellow-600" />
-    <p class="text-center text-lg font-bold text-white" id="servoValue">Posisi: 90°</p>
-</div>
+            <div class="p-6 bg-white shadow-lg rounded-xl bg-lime-600 my-5">
+                <h2 class="text-xl font-semibold mb-4 text-white">Kontrol Servo</h2>
+                <input type="range" id="servoPosition" min="0" max="180" value="90" 
+                    class="w-full p-2 border border-gray-300 rounded-md mb-2 text-yellow-600" />
+                <p class="text-center text-lg font-bold text-white" id="servoValue">Posisi: 90°</p>
+            </div>
 
-
-
-            <div class="p-6 bg-white shadow-lg rounded-xl  bg-emerald-700">
+            <div class="p-6 bg-white shadow-lg rounded-xl bg-emerald-700">
                 <h2 class="text-xl font-semibold mb-4 text-white">Kontrol Lampu</h2>
                 <div class="flex justify-between">
                     <button onclick="controlLamp('ON')" 
@@ -109,8 +111,10 @@
                         OFF
                     </button>
                 </div>
+                <div class="mt-4 p-4 bg-gray-100 rounded-md text-emerald-700">
+                    <p>Status Lampu: <span id="lampStatus" class="font-bold">--</span></p>
+                </div>
             </div>
-
 
             <div class="p-6 bg-white shadow-lg rounded-xl bg-purple-500">
                 <h2 class="text-xl font-semibold mb-4 text-white">Voice Control Lampu</h2>
@@ -120,179 +124,9 @@
                 </button>
                 <p id="voiceStatus" class="text-white text-center mt-2">Klik tombol di atas untuk memulai kontrol suara.</p>
             </div>
-                </div>
-
         </div>
     </div>
+</div>
 
-    <script>
-        const options = {
-            connectTimeout: 4000,
-            clientId: 'mqttx_1aba0144',
-            username: 'vesuf-iot',
-            password: 'vJZW5PbJXWRUpY7t',
-            keepalive: 60,
-            clean: true,
-        };
-
-        const client = mqtt.connect('wss://vesuf-iot.cloud.shiftr.io', options);
-
-        client.on('connect', () => {
-            console.log('Terhubung ke broker MQTT');
-            document.getElementById('brokerStatus').innerHTML =
-                'Status Broker: <span class="font-bold text-green-500">Terhubung</span>';
-            client.subscribe('vesuf-iot/#');
-        });
-
-        client.on('close', () => {
-            console.log('Terputus dari broker MQTT');
-            document.getElementById('brokerStatus').innerHTML =
-                'Status Broker: <span class="font-bold text-red-500">Terputus</span>';
-        });
-
-        client.on('message', (topic, message) => {
-            const payload = message.toString();
-            console.log('Pesan:', topic, payload);
-
-            if (topic === 'vesuf-iot/suhu') {
-                document.getElementById('suhu').innerText = payload;
-            } else if (topic === 'vesuf-iot/kelembaban') {
-                document.getElementById('kelembaban').innerText = payload;
-            } else if (topic === 'vesuf-iot/soil-moisture') {
-                document.getElementById('kelembabanTanah').innerText = payload;
-            } else if (topic === 'vesuf-iot/wifi') {
-                const espStatus = payload === 'online' 
-                    ? '<span class="font-bold text-green-500">Hidup</span>' 
-                    : '<span class="font-bold text-red-500">Mati</span>';
-                document.getElementById('espStatus').innerHTML = `Status ESP: ${espStatus}`;
-            }
-        });
-
-        document.getElementById('servoPosition').addEventListener('input', function() {
-    const servoValue = this.value;
-    document.getElementById('servoValue').innerText = `Posisi: ${servoValue}°`;
-    
-    client.publish('vesuf-iot/servo', servoValue, { qos: 1 }, (err) => {
-        if (err) {
-            alert('Kesalahan saat mengatur posisi servo.');
-            console.error('Kesalahan Publish:', err);
-        }
-    });
-});
-
-
-
-         function controlLamp(state) {
-            client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
-                if (err) {
-                    alert('Kesalahan saat mengontrol lampu.');
-                    console.error('Kesalahan Publish:', err);
-                } else {
-                    const response = state === 'ON' ? 'Lampu nyala.' : 'Lampu mati.';
-                    speakResponse(response);
-                }
-            });
-        }
-
-        function speakResponse(text) {
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'id-ID'; 
-            speech.volume = 1; 
-            speech.rate = 1; 
-            speech.pitch = 0.3;
-
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.speak(speech);
-            } else {
-                alert('Speech Synthesis tidak didukung di perangkat ini.');
-            }
-        }
-
-
-    let recognition;
-
-    function startVoiceControl() {
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-        } else if ('SpeechRecognition' in window) {
-            recognition = new SpeechRecognition();
-        } else {
-            alert('Speech Recognition tidak didukung di perangkat ini.');
-            return;
-        }
-
-        recognition.lang = 'id-ID'; // Bahasa Indonesia
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onstart = () => {
-            document.getElementById('voiceStatus').innerText = "Mendengarkan... Silakan berbicara.";
-        };
-
-        recognition.onresult = (event) => {
-            const hasil = event.results[0][0].transcript.toLowerCase();
-            document.getElementById('voiceStatus').innerText = `Anda berkata: "${hasil}"`;
-            processVoiceCommand(hasil);
-        };
-
-        recognition.onerror = (event) => {
-            document.getElementById('voiceStatus').innerText = "Terjadi kesalahan: " + event.error;
-        };
-
-        recognition.onend = () => {
-            document.getElementById('voiceStatus').innerText = "Voice control selesai.";
-        };
-
-        recognition.start();
-    }
-
-    function processVoiceCommand(command) {
-        // Daftar frasa untuk menyalakan lampu
-        const perintahNyalakan = [
-            "nyalakan lampu",
-            "lampu nyala",
-            "hidupkan lampu",
-            "lampu hidup",
-            "menyalalah lampu",
-            "tolong nyalakan lampu",
-            "bisa nyalakan lampu"
-        ];
-
-        // Daftar frasa untuk mematikan lampu
-        const perintahMatikan = [
-            "matikan lampu",
-            "lampu mati",
-            "padamkan lampu",
-            "lampu padam",
-            "tolong matikan lampu",
-            "bisa matikan lampu"
-        ];
-
-        if (perintahNyalakan.some(perintah => command.includes(perintah))) {
-            controlLamp("ON");
-            speakResponse("Lampu telah dinyalakan.");
-        } else if (perintahMatikan.some(perintah => command.includes(perintah))) {
-            controlLamp("OFF");
-            speakResponse("Lampu telah dimatikan.");
-        } else {
-            speakResponse("Perintah tidak dikenali. Coba lagi.");
-        }
-    }
-
-    function controlLamp(state) {
-        client.publish('vesuf-iot/lampu', state, { qos: 1 }, (err) => {
-            if (err) {
-                alert('Kesalahan saat mengontrol lampu.');
-                console.error('Kesalahan Publish:', err);
-            } else {
-                const response = state === 'ON' ? 'Lampu nyala.' : 'Lampu mati.';
-                speakResponse(response);
-            }
-        });
-    }
-
-
-
-    </script>
 </body>
 </html>
