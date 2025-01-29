@@ -76,7 +76,7 @@ function speakResponse(text) {
     speech.lang = 'id-ID'; 
     speech.volume = 1; 
     speech.rate = 1; 
-    speech.pitch = 1;
+    speech.pitch = 0;
 
     if ('speechSynthesis' in window) {
         window.speechSynthesis.speak(speech);
